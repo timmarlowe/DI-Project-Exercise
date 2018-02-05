@@ -5,7 +5,7 @@ set memory 2g
 set scheme s1color, permanently
 
 * Set directory *
-cd "C:\Users\Tim\Documents\DI Project\"
+cd "C:\Users\Tim\Documents\DI Project\DI Project Exercise"
 
 * Read in file *
 do NFWBS_PUF.do
@@ -33,11 +33,16 @@ ytitle("% of Group", size(small)) xtitle("Scaled Score", size(small)) ///
 title("Financial Well-Being Scaled Score by Federal Poverty Status", size(med))
 
 *But which financial skills do link to higher Financial well-being?
-reg FWBscore KHscore
-reg FWBscore FSscore
+reg FWBscore KHscore FSscore i.PPGENDER i.PPETHM i.agecat i.fpl
+rvfplot
+*Pretty good results - this has chance to be a solid model
+
+*Scattering FWB and FSscore over fpl
+twoway(scatter FWBscore FSscore, color(eltgreen))(qfit FWBscore FSscore, color(dkgreen)), ///
+ytitle("Financial Well-Being Scale Score", size(small)) xtitle("Financial Skill Scale Score", size(small)) by(fpl)
+graph export fwb_v_fs_fpl.png, replace
 
 egen FSscorecat = cut(FSscore), group(50) label
-
 graph bar (mean) FWBscore, over(FSscorecat)
 
 foreach v of varlist FS1_1 FS1_2 FS1_3 FS1_4 FS1_5 FS1_6 FS1_7 FS2_1 FS2_2 FS2_3 {
@@ -70,8 +75,4 @@ grc1leg FS1_1.gph FS1_7.gph, ///
 ycommon title("Financial Well-Being Scale Score by Financial Skills Question Responses", size(medsmall))
 graph export fscombined.png, replace
 
-twoway (hist FWBscore if fpl == 1, percent fcolor(edkblue) lcolor(gray) bin(40)) ///
-(hist FWBscore if fpl >1, percent fcolor(none) lcolor(black) bin(40)), ///
-legend(order(1 "Under Federal Poverty Line" 2 "Above Federal Poverty Line")) ///
-ytitle("% of Group", size(small)) xtitle("Scaled Score", size(small)) ///
-title("Financial Well-Being Scaled Score by Federal Poverty Status", size(med))
+
