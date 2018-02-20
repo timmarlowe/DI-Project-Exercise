@@ -99,3 +99,9 @@ xlabel(1 "Not at All" 2 "Very Little" 3 "Somewhat" 4 "Very Well" 5 "Completely",
 ylabel(, labsize(small))
 graph export FS1_7_fpl.png, replace
 drop m_FWB m_FWB1 m_FWB2 m_FWB3
+
+*Clustering on these three variables
+cluster singlelinkage FWBscore FSscore LMscore fpl, name(fwb_fs_lm_fpl)
+cluster tree fwb_fs_lm_fpl, cutn(5)
+graph export fwb_fpl_lm_fpl_dendo.png, replace
+
