@@ -8,8 +8,9 @@ set scheme s1color, permanently
 cd "C:\Users\Tim\Documents\DI Project\DI Project Exercise"
 
 * Read in file *
-do NFWBS_PUF.do
-save CFPB_survey.dta, replace
+*do NFWBS_PUF.do
+*save CFPB_survey.dta, replace
+use CFPB_survey.dta
 
 *Exploratory *
 summarize FWBscore, detail
@@ -32,19 +33,17 @@ legend(order(1 "Under Federal Poverty Line" 2 "Above Federal Poverty Line")) ///
 ytitle("% of Group", size(small)) xtitle("Scaled Score", size(small)) ///
 title("Financial Well-Being Scaled Score by Federal Poverty Status", size(med))
 
-*But which financial skills do link to higher Financial well-being?
-reg FWBscore KHscore FSscore i.PPGENDER i.PPETHM i.agecat i.fpl
-rvfplot
-*Pretty good results - this has chance to be a solid model
 
 *Scattering FWB and FSscore over fpl
 twoway(scatter FWBscore FSscore, color(eltgreen))(qfit FWBscore FSscore, color(dkgreen)), ///
 ytitle("Financial Well-Being Scale Score", size(small)) xtitle("Financial Skill Scale Score", size(small)) by(fpl)
 graph export fwb_v_fs_fpl.png, replace
 
-egen FSscorecat = cut(FSscore), group(50) label
-graph bar (mean) FWBscore, over(FSscorecat)
+reg FWBscore KHscore FSscore i.PPGENDER i.PPETHM i.agecat i.fpl
+rvfplot
+*Pretty highly related results
 
+*But which financial skills do link to higher Financial well-being?
 foreach v of varlist FS1_1 FS1_2 FS1_3 FS1_4 FS1_5 FS1_6 FS1_7 FS2_1 FS2_2 FS2_3 {
 	svy: reg FWBscore `v' if `v' != -1
 }
@@ -75,4 +74,13 @@ grc1leg FS1_1.gph FS1_7.gph, ///
 ycommon title("Financial Well-Being Scale Score by Financial Skills Question Responses", size(medsmall))
 graph export fscombined.png, replace
 
-
+*Digging in by income level
+*FS1
+bysort FS1_1 fpl: egen m_FWB = mean(FWBscore)
+separate m_FWB, by(fpl)
+graph twoway line m_FWB1 m_FWB2 m_FWB3 FS1_1 if FS1_1 != -1, ///
+xtitle("Skill: I know how to get myself to follow through on my financial intentions", size(small)) ///
+ytitle("Mean Financial Well-Being Score", size(small)) ///
+legend(order(1 "<100% FPL" 2 "100-199% FPL" 3 ">=200% FPL")) ///
+title("Financial Well-being Score by Financial Skill #1", size(med)) ///
+xlabel("Not at All" "Very Little" "Somewhat" "Very Well" "Completely", size(small))
