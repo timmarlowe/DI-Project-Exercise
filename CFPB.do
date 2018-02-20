@@ -83,4 +83,19 @@ xtitle("Skill: I know how to get myself to follow through on my financial intent
 ytitle("Mean Financial Well-Being Score", size(small)) ///
 legend(order(1 "<100% FPL" 2 "100-199% FPL" 3 ">=200% FPL")) ///
 title("Financial Well-being Score by Financial Skill #1", size(med)) ///
-xlabel("Not at All" "Very Little" "Somewhat" "Very Well" "Completely", size(small))
+xlabel(1 "Not at All" 2 "Very Little" 3 "Somewhat" 4 "Very Well" 5 "Completely", labsize(small)) ///
+ylabel(, labsize(small))
+graph export FS1_1_fpl.png, replace
+drop m_FWB m_FWB1 m_FWB2 m_FWB3
+
+bysort FS1_7 fpl: egen m_FWB = mean(FWBscore)
+separate m_FWB, by(fpl)
+graph twoway line m_FWB1 m_FWB2 m_FWB3 FS1_7 if FS1_7 != -1, ///
+xtitle("Skill: I know how to make myself save", size(small)) ///
+ytitle("Mean Financial Well-Being Score", size(small)) ///
+legend(order(1 "<100% FPL" 2 "100-199% FPL" 3 ">=200% FPL")) ///
+title("Financial Well-being Score by Financial Skill #7", size(med)) ///
+xlabel(1 "Not at All" 2 "Very Little" 3 "Somewhat" 4 "Very Well" 5 "Completely", labsize(small)) ///
+ylabel(, labsize(small))
+graph export FS1_7_fpl.png, replace
+drop m_FWB m_FWB1 m_FWB2 m_FWB3
